@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection>
+  <group name="auth">
+    <api name="login" method="POST" path="/auth/login">
+      <request>
+        <body>
+          <field name="username" type="string" required="true" />
+          <field name="password" type="string" required="true" />
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="token" type="string" />
+        </body>
+      </response>
+    </api>
+  </group>
+  <group name="users">
+    <api name="user" method="POST" path="/users/{family}">
+      <request>
+        <params>
+          <field name="family" type="string" required="true" />
+        </params>
+        <body>
+          <field name="username" type="string" required="true" />
+          <field name="email" type="string" required="true" />
+          <field name="password" type="string" required="true" />
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="id" type="string" />
+          <field name="username" type="string" />
+          <field name="email" type="string" />
+        </body>
+      </response>
+    </api>
+  </group>
+
+</collection>
