@@ -1,0 +1,26 @@
+{
+  "name": "dexterman",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"pnpm run dev:server\" \"pnpm run dev:css\"",
+    "dev:server": "tsx watch src/index.tsx",
+    "dev:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/styles.css --watch",
+    "build": "pnpm run build:css && tsc",
+    "build:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/styles.css --minify",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.13",
+    "hono": "^4.12.12",
+    "linkedom": "^0.18.12",
+    "xslt-processor": "^5.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "concurrently": "^9.2.1",
+    "daisyui": "^5.5.19",
+    "tailwindcss": "^4.2.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.8.3"
+  }
+}
