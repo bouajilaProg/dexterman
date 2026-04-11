@@ -4,16 +4,15 @@
     <var name="API_URL" value="https://api.example.com" />
   </env>
   <group name="auth">
-    <api name="login" method="POST" path="/auth/login">
+    <api name="login" method="POST" path="/auth/login/imed">
       <request>
         <body>
-          <field name="username" type="string" required="true" />
+          <field name="imed" type="string" required="true" />
           <field name="password" type="string" required="true" />
         </body>
       </request>
       <response>
         <body>
-          <field name="token" type="string" />
         </body>
       </response>
     </api>
@@ -21,9 +20,6 @@
   <group name="users">
     <api name="user" method="POST" path="/users/{family}">
       <request>
-        <params>
-          <field name="family" type="string" required="true" />
-        </params>
         <body>
           <field name="username" type="string" required="true" />
           <field name="email" type="string" required="true" />
@@ -39,5 +35,4 @@
       </response>
     </api>
   </group>
-
 </collection>
