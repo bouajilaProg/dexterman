@@ -7,6 +7,7 @@ Keep this file compact and high-signal. Include only details an agent is likely 
 - Dev server + CSS watch: `pnpm run dev` (runs `tsx watch src/index.tsx` + Tailwind build of `src/styles/tailwind.css` to `public/styles.css`)
 - Build: `pnpm run build` (builds CSS then `tsc`)
 - Start production: `pnpm run start` (runs `dist/index.js`)
+- Docker run: `docker compose up --build` (dev mode with live reload, serves app on `http://localhost:3000`)
 
 ## Runtime/entrypoints
 - Server entry: `src/index.tsx` (Hono app, serves `/`, `/health`, `/editor/data`, `/editor/save`, and static assets from `public` + `dist/pages/editor`)
@@ -22,6 +23,9 @@ Keep this file compact and high-signal. Include only details an agent is likely 
 - `public/styles.css` is generated; edit `src/styles/tailwind.css` instead.
 
 ## File map (role + pattern used)
+- `Dockerfile` — production multi-stage image; installs deps, builds TS/CSS, runs `node dist/index.js`.
+- `docker-compose.yml` — local dev container orchestration; runs `pnpm run dev` with bind mounts for `src`, `data`, `public`, `scripts`.
+- `.dockerignore` — excludes local build/cache/git files from Docker build context.
 - `src/index.tsx` — Hono server entrypoint; serves static assets from `public` + `dist/pages/editor`.
 - `src/pages/editor/editor.ts` — server-side editor module; route handlers + filesystem access for `data/base.xml`.
 - `src/pages/editor/editor-client.ts` — browser-side editor client; fetch wrapper for `/editor/data` and `/editor/save`.

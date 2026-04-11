@@ -21,6 +21,12 @@ Build and run with Docker Compose:
 docker compose up --build
 ```
 
+This runs the app in dev mode with auto-reload:
+
+- `tsx watch` restarts server on `src/` edits
+- Tailwind watches `src/styles/tailwind.css` and writes `public/styles.css`
+- bind mounts keep code/data changes live in the container
+
 Then open:
 
 ```bash
