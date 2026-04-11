@@ -2,7 +2,7 @@
  * @title pages/editor/editor-client.ts
  * @descrption Browser client helpers for loading and saving editor data through server endpoints.
  */
-import type { EditorData } from '../../core/editor-data.js'
+import type { EditorData } from './lib/editor-data.js'
 
 export const loadEditorData = async (): Promise<EditorData> => {
   const response = await fetch('/editor/data', { method: 'GET', cache: 'no-store' })

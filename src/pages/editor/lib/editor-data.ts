@@ -1,3 +1,7 @@
+/**
+ * @title pages/editor/lib/editor-data.ts
+ * @descrption Editor-local serializer/parser that maps JSON folder data to XML group nodes and back.
+ */
 import { XmlParser } from 'xslt-processor'
 
 export type EditorField = {
@@ -14,7 +18,7 @@ export type EditorApi = {
   responseBody?: EditorField[]
 }
 
-export type EditorGroup = {
+export type EditorFolder = {
   name: string
   apis?: EditorApi[]
 }
@@ -28,7 +32,7 @@ export type EditorData = {
   env?: {
     vars?: EditorVar[]
   }
-  groups?: EditorGroup[]
+  folders?: EditorFolder[]
 }
 
 type ParsedXmlNode = {
@@ -55,19 +59,14 @@ const escapeXml = (value: string) => value
 const attr = (name: string, value: string) => `${name}="${escapeXml(value)}"`
 
 const safeText = (value: unknown, fallback = '') => {
-  if (typeof value !== 'string') {
-    return fallback
-  }
+  if (typeof value !== 'string') return fallback
   return value.trim()
 }
 
 const fieldXml = (field: EditorField, includeRequired: boolean) => {
   const name = safeText(field.name)
   const type = safeText(field.type, 'string')
-
-  if (!name) {
-    return ''
-  }
+  if (!name) return ''
 
   if (includeRequired) {
     const required = field.required ? 'true' : 'false'
@@ -110,9 +109,9 @@ const apiXml = (api: EditorApi) => {
     .join('\n')
 }
 
-const groupXml = (group: EditorGroup) => {
-  const name = safeText(group.name, 'default')
-  const apis = group.apis ?? []
+const folderXml = (folder: EditorFolder) => {
+  const name = safeText(folder.name, 'default')
+  const apis = folder.apis ?? []
   const renderedApis = apis.map((api) => apiXml(api)).join('\n')
 
   return [
@@ -126,22 +125,20 @@ const groupXml = (group: EditorGroup) => {
 
 export const editorDataToXml = (data: EditorData) => {
   const envVars = data.env?.vars?.length ? data.env.vars : DEFAULT_ENV
-  const groups = data.groups ?? []
+  const folders = data.folders ?? []
 
   const envXml = envVars
     .map((item) => {
       const name = safeText(item.name)
       const value = safeText(item.value)
-      if (!name) {
-        return ''
-      }
+      if (!name) return ''
       return `    <var ${attr('name', name)} ${attr('value', value)} />`
     })
     .filter(Boolean)
     .join('\n')
 
-  const groupsXml = groups
-    .map((group) => groupXml(group))
+  const foldersXml = folders
+    .map((folder) => folderXml(folder))
     .filter(Boolean)
     .join('\n')
 
@@ -151,7 +148,7 @@ export const editorDataToXml = (data: EditorData) => {
     '  <env>',
     envXml,
     '  </env>',
-    groupsXml,
+    foldersXml,
     '</collection>'
   ]
     .filter((line) => line !== '')
@@ -159,18 +156,14 @@ export const editorDataToXml = (data: EditorData) => {
 }
 
 const getElementChildren = (node: ParsedXmlNode | null | undefined, name?: string) => {
-  if (!node) {
-    return [] as ParsedXmlNode[]
-  }
+  if (!node) return [] as ParsedXmlNode[]
 
   const items: ParsedXmlNode[] = []
   let current = node.firstChild ?? null
 
   while (current) {
-    if (current.nodeType === 1) {
-      if (!name || current.nodeName === name) {
-        items.push(current)
-      }
+    if (current.nodeType === 1 && (!name || current.nodeName === name)) {
+      items.push(current)
     }
     current = current.nextSibling ?? null
   }
@@ -179,9 +172,7 @@ const getElementChildren = (node: ParsedXmlNode | null | undefined, name?: strin
 }
 
 const getAttr = (node: ParsedXmlNode | null | undefined, name: string) => {
-  if (!node?.childNodes) {
-    return ''
-  }
+  if (!node?.childNodes) return ''
 
   for (const child of node.childNodes) {
     if (child.nodeType === 2 && child.nodeName === name) {
@@ -193,16 +184,11 @@ const getAttr = (node: ParsedXmlNode | null | undefined, name: string) => {
 }
 
 const parseFields = (root: ParsedXmlNode | null | undefined, includeRequired: boolean): EditorField[] => {
-  const fields = getElementChildren(root, 'field')
-
-  return fields
+  return getElementChildren(root, 'field')
     .map((fieldNode) => {
       const name = getAttr(fieldNode, 'name')
       const type = getAttr(fieldNode, 'type') || 'string'
-
-      if (!name) {
-        return null
-      }
+      if (!name) return null
 
       const field: EditorField = { name, type }
       if (includeRequired) {
@@ -219,16 +205,14 @@ export const editorXmlNodeToData = (collectionNode: ParsedXmlNode): EditorData =
     .map((varNode) => {
       const name = getAttr(varNode, 'name')
       const value = getAttr(varNode, 'value')
-      if (!name) {
-        return null
-      }
+      if (!name) return null
       return { name, value }
     })
     .filter((item): item is EditorVar => item !== null)
 
-  const groupNodes = getElementChildren(collectionNode, 'group')
-  const groups: EditorGroup[] = groupNodes.map((groupNode) => {
-    const apiNodes = getElementChildren(groupNode, 'api')
+  const folderNodes = getElementChildren(collectionNode, 'group')
+  const folders: EditorFolder[] = folderNodes.map((folderNode) => {
+    const apiNodes = getElementChildren(folderNode, 'api')
     const apis: EditorApi[] = apiNodes.map((apiNode) => {
       const requestNode = getElementChildren(apiNode, 'request')[0]
       const requestBodyNode = getElementChildren(requestNode, 'body')[0]
@@ -245,7 +229,7 @@ export const editorXmlNodeToData = (collectionNode: ParsedXmlNode): EditorData =
     })
 
     return {
-      name: getAttr(groupNode, 'name') || 'default',
+      name: getAttr(folderNode, 'name') || 'default',
       apis
     }
   })
@@ -254,7 +238,7 @@ export const editorXmlNodeToData = (collectionNode: ParsedXmlNode): EditorData =
     env: {
       vars: envVars.length ? envVars : DEFAULT_ENV
     },
-    groups
+    folders
   }
 }
 

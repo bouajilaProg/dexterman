@@ -10,11 +10,10 @@ Keep this file compact and high-signal. Include only details an agent is likely 
 
 ## Runtime/entrypoints
 - Server entry: `src/index.tsx` (Hono app, serves `/`, `/health`, `/editor/data`, `/editor/save`, and static assets from `public` + `dist/pages/editor`)
-- Server-side editor logic: `src/pages/editor/editor.ts` (render/init + load/save handlers backed by `data/base.xml`)
+- Server-side editor logic: `src/pages/editor/editor.ts` (render/init + load/save handlers backed by `data/base.xml`, supports `?folder=&api=&path=` selection)
 - Editor client library: `src/pages/editor/editor-client.ts` (browser load/save helpers that call server endpoints)
-- Editor UI boot: `src/pages/editor/ui.ts` (UI-only browser behavior; wires SAVE button to client library, caches data at init)
-- XML→HTML transform: `src/core/transform.ts` (Xslt with `xslt-processor`, embeds HTML with LinkeDOM)
-- JSON↔XML editor serialization: `src/core/editor-data.ts` (JSON payload shape used by save endpoint)
+- Editor UI boot: `src/pages/editor/ui.ts` (UI-only browser behavior; SAVE button + folder drag/drop autosave)
+- Editor module lib: `src/pages/editor/lib/*` (editor-scoped serializer/transform helpers; module-local core)
 
 ## Dev vs Prod path resolution
 - Determined automatically from `import.meta.url`: if running from `src/`, dev paths are used; if from `dist/`, prod paths.
@@ -26,12 +25,12 @@ Keep this file compact and high-signal. Include only details an agent is likely 
 - `src/index.tsx` — Hono server entrypoint; serves static assets from `public` + `dist/pages/editor`.
 - `src/pages/editor/editor.ts` — server-side editor module; route handlers + filesystem access for `data/base.xml`.
 - `src/pages/editor/editor-client.ts` — browser-side editor client; fetch wrapper for `/editor/data` and `/editor/save`.
-- `src/core/transform.ts` — XSLT pipeline; XML + XSLT → HTML string, reads XML/XSLT in parallel, embeds into layout by element id.
-- `src/core/editor-data.ts` — serializer/parser; editor JSON model ↔ XML `<collection>/<group>/<api>`.
+- `src/pages/editor/lib/transform.ts` — editor-local XSLT pipeline; XML + XSLT → HTML string, embeds into layout by element id.
+- `src/pages/editor/lib/editor-data.ts` — editor-local serializer/parser; editor JSON model (`folders`) ↔ XML `<collection>/<group>/<api>`.
 - `src/pages/editor/page.html` — base layout; HTML shell with `#sidebar` and `#editor` placeholders.
-- `src/pages/editor/components/editor.xsl` — editor view template; uses named `xsl:call-template` for type-select, method-select, required-badge, row-actions.
-- `src/pages/editor/components/sidebar.xsl` — sidebar view template; XSLT 1.0 transform for folder/API tree.
-- `src/pages/editor/ui.ts` — browser behavior; caches data at init, builds payload from DOM + cache on save.
+- `src/pages/editor/components/editor.xsl` — editor view template; uses named `xsl:call-template` for type-select, method-select, required-badge, row-actions; renders first API of first folder.
+- `src/pages/editor/components/sidebar.xsl` — sidebar view template; XSLT 1.0 transform for folder/API tree with active API markers.
+- `src/pages/editor/ui.ts` — browser behavior; caches data at init, builds payload from DOM + cache on SAVE, autosaves folder API moves then reloads with selected API query.
 - `src/pages/editor/components/ui/editor.ts` — main attachEditor; wires click delegation, drag-drop, save via sub-modules.
 - `src/pages/editor/components/ui/dirty-state.ts` — save button dirty/busy state management.
 - `src/pages/editor/components/ui/empty-row.ts` — empty row placeholder for tables.
