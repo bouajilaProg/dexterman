@@ -26,7 +26,7 @@ Keep this file compact and high-signal. Include only details an agent is likely 
 - `src/index.tsx` — Hono server entrypoint; serves static assets from `public` + `dist/pages/editor`.
 - `src/pages/editor/editor.ts` — server-side editor module; route handlers + filesystem access for `data/base.xml`.
 - `src/pages/editor/editor-client.ts` — browser-side editor client; fetch wrapper for `/editor/data` and `/editor/save`.
-- `src/core/transform.ts` — XSLT pipeline; XML + XSLT → HTML string, embed into layout by element id.
+- `src/core/transform.ts` — XSLT pipeline; XML + XSLT → HTML string, reads XML/XSLT in parallel, embeds into layout by element id.
 - `src/core/editor-data.ts` — serializer/parser; editor JSON model ↔ XML `<collection>/<group>/<api>`.
 - `src/pages/editor/page.html` — base layout; HTML shell with `#sidebar` and `#editor` placeholders.
 - `src/pages/editor/components/editor.xsl` — editor view template; uses named `xsl:call-template` for type-select, method-select, required-badge, row-actions.
