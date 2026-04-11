@@ -6,7 +6,7 @@
 
   <xsl:template match="/">
     <xsl:variable name="selectedApi" select="/collection/group[1]/api[1]"/>
-    <xsl:variable name="selectedGroup" select="/collection/group[1]"/>
+    <xsl:variable name="selectedFolder" select="/collection/group[1]"/>
 
     <aside class="h-full w-72 bg-[#16161e] border-r border-[#292e42] flex flex-col">
       <div class="h-12 flex items-center justify-between px-4 border-b border-[#292e42]">
@@ -35,13 +35,16 @@
             </summary>
 
             <div class="ml-4 mt-1 p-1 space-y-1 min-h-[2rem]" data-folder-list="">
-              <xsl:if test="generate-id(.) = generate-id($selectedGroup)">
+              <xsl:if test="generate-id(.) = generate-id($selectedFolder)">
                 <button class="w-full p-2 text-[10px] uppercase font-bold text-[#565f89] border border-dashed border-[#292e42] rounded hover:text-[#7aa2f7] hover:border-[#7aa2f7] transition-colors" data-handler="new-api">
                   + NEW API
                 </button>
               </xsl:if>
               <xsl:for-each select="api">
-                <div data-api-item="" data-api-name="{@name}" draggable="true">
+                <div data-api-item="" data-api-name="{@name}" data-api-path="{@path}" draggable="true">
+                  <xsl:if test="generate-id(.) = generate-id($selectedApi)">
+                    <xsl:attribute name="data-api-active">true</xsl:attribute>
+                  </xsl:if>
                   <xsl:attribute name="class">
                     <xsl:choose>
                       <xsl:when test="generate-id(.) = generate-id($selectedApi)">

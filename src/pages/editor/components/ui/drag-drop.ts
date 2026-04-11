@@ -4,6 +4,18 @@
  */
 import { getLucide } from './dirty-state.js'
 
+export type ApiDropPayload = {
+    sourceFolder: string
+    targetFolder: string
+    apiName: string
+    apiPath: string | null
+    isActive: boolean
+}
+
+type DragDropOptions = {
+    onApiDrop?: (payload: ApiDropPayload) => Promise<void> | void
+}
+
 type DragState = {
     apiItem: HTMLElement | null
     row: HTMLTableRowElement | null
@@ -58,7 +70,12 @@ const handleDragOver = (e: DragEvent, state: DragState) => {
     dropzone.classList.add('ring-1', 'ring-[#7aa2f7]', 'bg-[#7aa2f7]/10')
 }
 
-const handleDrop = (e: DragEvent, state: DragState, onDirty: () => void) => {
+const handleDrop = async (
+    e: DragEvent,
+    state: DragState,
+    onDirty: () => void,
+    options: DragDropOptions
+) => {
     const target = e.target instanceof Element ? e.target : null
     const dropzone = target?.closest('[data-folder-dropzone]')
 
@@ -67,12 +84,46 @@ const handleDrop = (e: DragEvent, state: DragState, onDirty: () => void) => {
         const list = dropzone.querySelector('[data-folder-list]')
         if (!list) return
 
+        const sourceZone = state.apiItem.closest('[data-folder-dropzone]')
+        const sourceFolder = sourceZone?.getAttribute('data-folder-name') ?? ''
+        const targetFolder = dropzone.getAttribute('data-folder-name') ?? ''
+        const apiName = state.apiItem.getAttribute('data-api-name') ?? ''
+        const apiPathAttr = state.apiItem.getAttribute('data-api-path')
+        const apiPath = apiPathAttr && apiPathAttr.trim() ? apiPathAttr.trim() : null
+        const isActive = state.apiItem.classList.contains('border-l-2') && state.apiItem.classList.contains('border-[#7aa2f7]')
+
+        const originalParent = state.apiItem.parentElement
+        const originalNextSibling = state.apiItem.nextElementSibling
+
         list.appendChild(state.apiItem)
         clearFolderHighlights()
         state.apiItem.classList.remove('opacity-50')
+
+        if (options.onApiDrop && sourceFolder && targetFolder && apiName && sourceFolder !== targetFolder) {
+            try {
+                await options.onApiDrop({
+                    sourceFolder,
+                    targetFolder,
+                    apiName,
+                    apiPath,
+                    isActive
+                })
+            } catch {
+                if (originalParent) {
+                    if (originalNextSibling) {
+                        originalParent.insertBefore(state.apiItem, originalNextSibling)
+                    } else {
+                        originalParent.appendChild(state.apiItem)
+                    }
+                }
+                onDirty()
+            }
+        } else {
+            onDirty()
+        }
+
         state.apiItem = null
         getLucide()?.createIcons()
-        onDirty()
         return
     }
 
@@ -93,11 +144,13 @@ const handleDrop = (e: DragEvent, state: DragState, onDirty: () => void) => {
     getLucide()?.createIcons()
 }
 
-export const attachDragDrop = (onDirty: () => void) => {
+export const attachDragDrop = (onDirty: () => void, options: DragDropOptions = {}) => {
     const state: DragState = { apiItem: null, row: null }
 
     document.addEventListener('dragstart', (e) => handleDragStart(e, state))
     document.addEventListener('dragend', () => handleDragEnd(state))
     document.addEventListener('dragover', (e) => handleDragOver(e, state))
-    document.addEventListener('drop', (e) => handleDrop(e, state, onDirty))
+    document.addEventListener('drop', (e) => {
+        void handleDrop(e, state, onDirty, options)
+    })
 }

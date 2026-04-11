@@ -3,13 +3,14 @@
  * @descrption Main UI composer that binds editor click/input handlers and delegates to specialized UI modules.
  */
 import { getLucide, setSaveDirty } from './dirty-state.js'
-import { attachDragDrop } from './drag-drop.js'
+import { attachDragDrop, type ApiDropPayload } from './drag-drop.js'
 import { initEmptyRows } from './empty-row.js'
 import { addRow, deleteRow, moveRow, toggleRequired } from './row-actions.js'
 import { attachSaveHandler } from './save-handler.js'
 
 type AttachEditorOptions = {
   onSave?: () => Promise<void> | void
+  onApiDrop?: (payload: ApiDropPayload) => Promise<void> | void
 }
 
 export const attachEditor = (options: AttachEditorOptions = {}) => {
@@ -51,6 +52,8 @@ export const attachEditor = (options: AttachEditorOptions = {}) => {
     }
   })
 
-  attachDragDrop(markDirty)
+  attachDragDrop(markDirty, {
+    onApiDrop: options.onApiDrop
+  })
   attachSaveHandler(isDirtyRef, options.onSave)
 }
