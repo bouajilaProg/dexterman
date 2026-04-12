@@ -16,11 +16,21 @@ export type EditorApi = {
   path: string
   requestBody?: EditorField[]
   responseBody?: EditorField[]
+  selected?: boolean
 }
 
 export type EditorFolder = {
   name: string
   apis?: EditorApi[]
+  selected?: boolean
+}
+
+export type EditorUiState = {
+  notFound?: boolean
+  message?: string
+  selectedScope?: 'root' | 'folder'
+  selectedFolder?: string
+  selectedApi?: string
 }
 
 export type EditorVar = {
@@ -32,7 +42,9 @@ export type EditorData = {
   env?: {
     vars?: EditorVar[]
   }
+  apis?: EditorApi[]
   folders?: EditorFolder[]
+  ui?: EditorUiState
 }
 
 type ParsedXmlNode = {
@@ -58,6 +70,15 @@ const escapeXml = (value: string) => value
 
 const attr = (name: string, value: string) => `${name}="${escapeXml(value)}"`
 
+/**
+ * @title conditionalAttr
+ * @description Returns optional XML attribute snippet when a value exists.
+ */
+const conditionalAttr = (name: string, value?: string) => {
+  if (!value) return ''
+  return ` ${attr(name, value)}`
+}
+
 const safeText = (value: unknown, fallback = '') => {
   if (typeof value !== 'string') return fallback
   return value.trim()
@@ -77,6 +98,11 @@ const fieldXml = (field: EditorField, includeRequired: boolean) => {
 }
 
 const apiXml = (api: EditorApi) => {
+  /**
+   * @title apiXml:selectedAttr
+   * @description Builds optional XML attributes for UI-only selected state.
+   */
+  const selectedAttr = api.selected ? ` ${attr('selected', 'true')}` : ''
   const name = safeText(api.name, 'api')
   const method = safeText(api.method, 'GET').toUpperCase()
   const path = safeText(api.path, '/')
@@ -92,7 +118,7 @@ const apiXml = (api: EditorApi) => {
     .join('\n')
 
   return [
-    `    <api ${attr('name', name)} ${attr('method', method)} ${attr('path', path)}>` ,
+    `    <api ${attr('name', name)} ${attr('method', method)} ${attr('path', path)}${selectedAttr}>`,
     '      <request>',
     '        <body>',
     requestBody,
@@ -110,12 +136,17 @@ const apiXml = (api: EditorApi) => {
 }
 
 const folderXml = (folder: EditorFolder) => {
+  /**
+   * @title folderXml:selectedAttr
+   * @description Builds optional XML attributes for UI-only selected state.
+   */
+  const selectedAttr = folder.selected ? ` ${attr('selected', 'true')}` : ''
   const name = safeText(folder.name, 'default')
   const apis = folder.apis ?? []
   const renderedApis = apis.map((api) => apiXml(api)).join('\n')
 
   return [
-    `  <group ${attr('name', name)}>`,
+    `  <group ${attr('name', name)}${selectedAttr}>`,
     renderedApis,
     '  </group>'
   ]
@@ -123,8 +154,74 @@ const folderXml = (folder: EditorFolder) => {
     .join('\n')
 }
 
+/**
+ * @title rootApiXml
+ * @description Renders collection-level APIs that are not inside folders.
+ */
+const rootApiXml = (api: EditorApi) => {
+  const selectedAttr = api.selected ? ` ${attr('selected', 'true')}` : ''
+  const name = safeText(api.name, 'api')
+  const method = safeText(api.method, 'GET').toUpperCase()
+  const path = safeText(api.path, '/')
+
+  const requestBody = (api.requestBody ?? [])
+    .map((field) => fieldXml(field, true))
+    .filter(Boolean)
+    .join('\n')
+
+  const responseBody = (api.responseBody ?? [])
+    .map((field) => fieldXml(field, false))
+    .filter(Boolean)
+    .join('\n')
+
+  return [
+    `  <api ${attr('name', name)} ${attr('method', method)} ${attr('path', path)}${selectedAttr}>`,
+    '    <request>',
+    '      <body>',
+    requestBody,
+    '      </body>',
+    '    </request>',
+    '    <response>',
+    '      <body>',
+    responseBody,
+    '      </body>',
+    '    </response>',
+    '  </api>'
+  ]
+    .filter((line) => line !== '')
+    .join('\n')
+}
+
+/**
+ * @title uiXml
+ * @description Renders transient UI metadata used only for server-side rendering.
+ */
+const uiXml = (ui?: EditorUiState) => {
+  if (!ui) return ''
+
+  const selectedScope = ui.selectedScope === 'root' || ui.selectedScope === 'folder'
+    ? ui.selectedScope
+    : undefined
+
+  const selectedFolder = safeText(ui.selectedFolder)
+  const selectedApi = safeText(ui.selectedApi)
+  const message = safeText(ui.message)
+  const notFound = ui.notFound ? 'true' : undefined
+
+  const attrs = [
+    conditionalAttr('not-found', notFound),
+    conditionalAttr('selected-scope', selectedScope),
+    conditionalAttr('selected-folder', selectedFolder),
+    conditionalAttr('selected-api', selectedApi),
+    conditionalAttr('message', message)
+  ].join('')
+
+  return `  <ui${attrs} />`
+}
+
 export const editorDataToXml = (data: EditorData) => {
   const envVars = data.env?.vars?.length ? data.env.vars : DEFAULT_ENV
+  const rootApis = data.apis ?? []
   const folders = data.folders ?? []
 
   const envXml = envVars
@@ -142,12 +239,21 @@ export const editorDataToXml = (data: EditorData) => {
     .filter(Boolean)
     .join('\n')
 
+  const rootApisXml = rootApis
+    .map((api) => rootApiXml(api))
+    .filter(Boolean)
+    .join('\n')
+
+  const uiBlock = uiXml(data.ui)
+
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<collection>',
     '  <env>',
     envXml,
     '  </env>',
+    uiBlock,
+    rootApisXml,
     foldersXml,
     '</collection>'
   ]
@@ -199,6 +305,25 @@ const parseFields = (root: ParsedXmlNode | null | undefined, includeRequired: bo
     .filter((field): field is EditorField => field !== null)
 }
 
+/**
+ * @title parseApiNode
+ * @description Parses one API node from XML into the editor data shape.
+ */
+const parseApiNode = (apiNode: ParsedXmlNode): EditorApi => {
+  const requestNode = getElementChildren(apiNode, 'request')[0]
+  const requestBodyNode = getElementChildren(requestNode, 'body')[0]
+  const responseNode = getElementChildren(apiNode, 'response')[0]
+  const responseBodyNode = getElementChildren(responseNode, 'body')[0]
+
+  return {
+    name: getAttr(apiNode, 'name') || 'api',
+    method: getAttr(apiNode, 'method') || 'GET',
+    path: getAttr(apiNode, 'path') || '/',
+    requestBody: parseFields(requestBodyNode, true),
+    responseBody: parseFields(responseBodyNode, false)
+  }
+}
+
 export const editorXmlNodeToData = (collectionNode: ParsedXmlNode): EditorData => {
   const envNode = getElementChildren(collectionNode, 'env')[0]
   const envVars = getElementChildren(envNode, 'var')
@@ -210,27 +335,17 @@ export const editorXmlNodeToData = (collectionNode: ParsedXmlNode): EditorData =
     })
     .filter((item): item is EditorVar => item !== null)
 
+  const rootApiNodes = getElementChildren(collectionNode, 'api')
+  const apis: EditorApi[] = rootApiNodes.map(parseApiNode)
+
   const folderNodes = getElementChildren(collectionNode, 'group')
   const folders: EditorFolder[] = folderNodes.map((folderNode) => {
     const apiNodes = getElementChildren(folderNode, 'api')
-    const apis: EditorApi[] = apiNodes.map((apiNode) => {
-      const requestNode = getElementChildren(apiNode, 'request')[0]
-      const requestBodyNode = getElementChildren(requestNode, 'body')[0]
-      const responseNode = getElementChildren(apiNode, 'response')[0]
-      const responseBodyNode = getElementChildren(responseNode, 'body')[0]
-
-      return {
-        name: getAttr(apiNode, 'name') || 'api',
-        method: getAttr(apiNode, 'method') || 'GET',
-        path: getAttr(apiNode, 'path') || '/',
-        requestBody: parseFields(requestBodyNode, true),
-        responseBody: parseFields(responseBodyNode, false)
-      }
-    })
+    const folderApis: EditorApi[] = apiNodes.map(parseApiNode)
 
     return {
       name: getAttr(folderNode, 'name') || 'default',
-      apis
+      apis: folderApis
     }
   })
 
@@ -238,6 +353,7 @@ export const editorXmlNodeToData = (collectionNode: ParsedXmlNode): EditorData =
     env: {
       vars: envVars.length ? envVars : DEFAULT_ENV
     },
+    apis,
     folders
   }
 }
