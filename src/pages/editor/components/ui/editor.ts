@@ -11,6 +11,13 @@ import { attachSaveHandler } from './save-handler.js'
 type AttachEditorOptions = {
   onSave?: () => Promise<void> | void
   onApiDrop?: (payload: ApiDropPayload) => Promise<void> | void
+  onNewFolder?: () => Promise<void> | void
+  onNewRootApi?: () => Promise<void> | void
+  onDeleteRootApi?: (apiName: string) => Promise<void> | void
+  onRenameFolder?: (folderName: string) => Promise<void> | void
+  onDeleteFolder?: (folderName: string) => Promise<void> | void
+  onNewApi?: (folderName: string) => Promise<void> | void
+  onDeleteApi?: (folderName: string, apiName: string) => Promise<void> | void
 }
 
 export const attachEditor = (options: AttachEditorOptions = {}) => {
@@ -23,8 +30,61 @@ export const attachEditor = (options: AttachEditorOptions = {}) => {
   }
 
   const actions: Record<string, (trigger: Element) => void> = {
-    'new-folder': markDirty,
-    'new-api': markDirty,
+    'new-folder': () => {
+      if (options.onNewFolder) {
+        void options.onNewFolder()
+        return
+      }
+      markDirty()
+    },
+    'new-root-api': () => {
+      if (options.onNewRootApi) {
+        void options.onNewRootApi()
+        return
+      }
+      markDirty()
+    },
+    'delete-root-api': (t) => {
+      const apiName = t.getAttribute('data-api-name')
+        ?? t.closest('[data-api-item]')?.getAttribute('data-api-name')
+        ?? ''
+      if (options.onDeleteRootApi && apiName) {
+        void options.onDeleteRootApi(apiName)
+      }
+    },
+    'rename-folder': (t) => {
+      const folderName = t.getAttribute('data-folder-name') ?? ''
+      if (options.onRenameFolder && folderName) {
+        void options.onRenameFolder(folderName)
+      }
+    },
+    'delete-folder': (t) => {
+      const folderName = t.getAttribute('data-folder-name') ?? ''
+      if (options.onDeleteFolder && folderName) {
+        void options.onDeleteFolder(folderName)
+      }
+    },
+    'new-api': (t) => {
+      const folderName = t.getAttribute('data-folder-name')
+        ?? t.closest('[data-folder-dropzone]')?.getAttribute('data-folder-name')
+        ?? ''
+      if (options.onNewApi && folderName) {
+        void options.onNewApi(folderName)
+        return
+      }
+      markDirty()
+    },
+    'delete-api': (t) => {
+      const folderName = t.getAttribute('data-folder-name')
+        ?? t.closest('[data-folder-dropzone]')?.getAttribute('data-folder-name')
+        ?? ''
+      const apiName = t.getAttribute('data-api-name')
+        ?? t.closest('[data-api-item]')?.getAttribute('data-api-name')
+        ?? ''
+      if (options.onDeleteApi && folderName && apiName) {
+        void options.onDeleteApi(folderName, apiName)
+      }
+    },
     'env-page': markDirty,
     'add': (t) => { if (addRow(t)) markDirty() },
     'delete': (t) => { if (deleteRow(t)) markDirty() },
@@ -40,6 +100,9 @@ export const attachEditor = (options: AttachEditorOptions = {}) => {
     const target = e.target instanceof Element ? e.target : null
     const trigger = target?.closest('[data-handler]')
     if (!trigger) return
+
+    e.preventDefault()
+    e.stopPropagation()
 
     const action = trigger.getAttribute('data-handler') ?? ''
     actions[action]?.(trigger)
