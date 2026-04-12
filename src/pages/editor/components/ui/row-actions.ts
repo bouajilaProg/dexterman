@@ -50,10 +50,15 @@ export const moveRow = (trigger: Element, direction: 'up' | 'down'): boolean => 
 
 export const toggleRequired = (trigger: Element) => {
     const isYes = trigger.textContent?.trim() === 'YES'
-    trigger.textContent = isYes ? 'NO' : 'YES'
+    const nextIsYes = !isYes
+    trigger.textContent = nextIsYes ? 'YES' : 'NO'
 
-    trigger.classList.toggle('bg-[#7aa2f7]/20', !isYes)
-    trigger.classList.toggle('text-[#7aa2f7]', !isYes)
-    trigger.classList.toggle('bg-[#292e42]', isYes)
-    trigger.classList.toggle('text-[#565f89]', isYes)
+    if (nextIsYes) {
+        trigger.classList.remove('bg-bg-elevated', 'text-text-dim')
+        trigger.classList.add('bg-accent-primary/20', 'text-accent-primary')
+    } else {
+        trigger.classList.remove('bg-accent-primary/20', 'text-accent-primary')
+        trigger.classList.add('bg-bg-elevated', 'text-text-dim')
+    }
 }
+
