@@ -14,7 +14,7 @@ import {
   type EditorFolder,
   type EditorUiState
 } from './lib/editor-data.js'
-import { embed, transformXmlWithPath } from './lib/transform.js'
+import { embed, transformXmlWithPath } from '../../lib/transform.js'
 
 const isDev = fileURLToPath(import.meta.url).includes('/src/')
 const BASE_DIR = join(process.cwd(), isDev ? 'src' : 'dist')
