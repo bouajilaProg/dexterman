@@ -20,3 +20,8 @@
   --font-sans: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
+
+@layer utilities {
+  tbody tr:first-child [data-handler="move-up"] { display: none; }
+  tbody tr:last-child [data-handler="move-down"] { display: none; }
+}

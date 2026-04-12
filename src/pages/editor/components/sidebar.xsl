@@ -99,7 +99,7 @@
               </span>
             </summary>
 
-            <div class="ml-4 mt-1 p-1 space-y-1 min-h-[2rem]" data-folder-list="">
+            <div class="ml-4 mt-0.5 space-y-0.5 min-h-[2rem]" data-folder-list="">
               <xsl:for-each select="api">
                 <div data-api-item="" data-api-name="{@name}" data-api-path="{@path}" draggable="true">
                   <xsl:if test="@selected='true'">
@@ -121,7 +121,7 @@
                       <xsl:attribute name="class">
                         <xsl:text>text-[9px] font-black mr-2 </xsl:text>
                         <xsl:choose>
-                          <xsl:when test="@method = 'GET'">text-text-bright</xsl:when>
+                          <xsl:when test="@method = 'GET'">text-accent-success</xsl:when>
                           <xsl:when test="@method = 'POST'">text-accent-primary</xsl:when>
                           <xsl:when test="@method = 'PUT'">text-accent-warning</xsl:when>
                           <xsl:otherwise>text-accent-danger</xsl:otherwise>

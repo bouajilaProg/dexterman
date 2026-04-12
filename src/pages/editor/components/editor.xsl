@@ -27,20 +27,23 @@
 
   <xsl:template name="type-select">
     <xsl:param name="current" select="'string'"/>
-    <select class="bg-transparent outline-none text-text-dim cursor-pointer appearance-none">
-      <option>
-        <xsl:if test="$current = 'string'"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
-        string
-      </option>
-      <option>
-        <xsl:if test="$current = 'number'"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
-        number
-      </option>
-      <option>
-        <xsl:if test="$current = 'object'"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
-        object
-      </option>
-    </select>
+    <div class="relative inline-block w-full">
+      <select class="bg-transparent outline-none text-text-dim cursor-pointer appearance-none w-full pr-6 relative z-10">
+        <option>
+          <xsl:if test="$current = 'string'"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
+          string
+        </option>
+        <option>
+          <xsl:if test="$current = 'number'"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
+          number
+        </option>
+        <option>
+          <xsl:if test="$current = 'object'"><xsl:attribute name="selected">selected</xsl:attribute></xsl:if>
+          object
+        </option>
+      </select>
+      <i data-lucide="chevron-down" class="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 text-text-dim pointer-events-none z-0"></i>
+    </div>
   </xsl:template>
 
   <xsl:template name="required-badge">
@@ -60,7 +63,7 @@
 
   <xsl:template name="row-actions">
     <xsl:param name="accent" select="'var(--color-accent-primary)'"/>
-    <div class="flex items-center justify-center gap-1">
+    <div class="flex items-center justify-end gap-1">
       <button data-handler="move-up">
         <xsl:attribute name="class">text-text-dim hover:text-[<xsl:value-of select="$accent"/>] transition-colors</xsl:attribute>
         <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>
@@ -69,7 +72,7 @@
         <xsl:attribute name="class">text-text-dim hover:text-[<xsl:value-of select="$accent"/>] transition-colors</xsl:attribute>
         <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
       </button>
-      <button class="text-text-dim hover:text-accent-danger transition-colors" data-action="delete" data-handler="delete">
+      <button class="text-text-dim hover:text-accent-danger transition-colors ml-1" data-action="delete" data-handler="delete">
         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
       </button>
     </div>
@@ -85,16 +88,19 @@
         <tr class="border-t border-border-subtle" draggable="true">
           <td class="py-1 px-2 w-1/2"><input type="text" value="" placeholder="field_name" class="bg-transparent w-full focus:text-accent-primary outline-none" /></td>
           <td class="py-1 px-2 w-1/4">
-            <select class="bg-transparent outline-none text-text-dim cursor-pointer appearance-none">
-              <option>string</option><option>number</option><option>object</option>
-            </select>
+            <div class="relative inline-block w-full">
+              <select class="bg-transparent outline-none text-text-dim cursor-pointer appearance-none w-full pr-6 relative z-10">
+                <option>string</option><option>number</option><option>object</option>
+              </select>
+              <i data-lucide="chevron-down" class="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 text-text-dim pointer-events-none z-0"></i>
+            </div>
           </td>
           <td class="py-1 px-2 w-20 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-black bg-bg-elevated text-text-dim cursor-pointer" data-action="toggle-req" data-handler="toggle">NO</span></td>
-          <td class="py-1 px-2 w-10 text-center">
-            <div class="flex items-center justify-center gap-1">
+          <td class="py-1 px-2 w-16 pr-4">
+            <div class="flex items-center justify-end gap-1">
               <button class="text-text-dim hover:text-accent-primary transition-colors" data-handler="move-up"><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></button>
               <button class="text-text-dim hover:text-accent-primary transition-colors" data-handler="move-down"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
-              <button class="text-text-dim hover:text-accent-danger transition-colors" data-action="delete" data-handler="delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              <button class="text-text-dim hover:text-accent-danger transition-colors ml-1" data-action="delete" data-handler="delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </td>
         </tr>
@@ -104,15 +110,18 @@
         <tr class="border-b border-border-subtle last:border-0" draggable="true">
           <td class="py-1 px-2 w-1/2"><input type="text" value="" placeholder="field_name" class="bg-transparent w-full text-accent-success outline-none" /></td>
           <td class="py-1 px-2 w-1/4">
-            <select class="bg-transparent outline-none text-text-dim cursor-pointer appearance-none">
-              <option>string</option><option>number</option><option>object</option>
-            </select>
+            <div class="relative inline-block w-full">
+              <select class="bg-transparent outline-none text-text-dim cursor-pointer appearance-none w-full pr-6 relative z-10">
+                <option>string</option><option>number</option><option>object</option>
+              </select>
+              <i data-lucide="chevron-down" class="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 text-text-dim pointer-events-none z-0"></i>
+            </div>
           </td>
-          <td class="py-1 px-2 w-10 text-center">
-            <div class="flex items-center justify-center gap-1">
+          <td class="py-1 px-2 w-16 pr-4">
+            <div class="flex items-center justify-end gap-1">
               <button class="text-text-dim hover:text-accent-success transition-colors" data-handler="move-up"><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></button>
               <button class="text-text-dim hover:text-accent-success transition-colors" data-handler="move-down"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
-              <button class="text-text-dim hover:text-accent-danger transition-colors" data-action="delete" data-handler="delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              <button class="text-text-dim hover:text-accent-danger transition-colors ml-1" data-action="delete" data-handler="delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </td>
         </tr>
@@ -155,7 +164,7 @@
                         <th class="w-1/2 py-1 px-2 font-normal">FIELD NAME</th>
                         <th class="w-1/4 py-1 px-2 font-normal">TYPE</th>
                         <th class="w-20 py-1 px-2 font-normal text-center">REQ</th>
-                        <th class="w-10 py-1 px-2"></th>
+                        <th class="w-16 py-1 px-2 pr-4 text-right"></th>
                       </tr>
                     </thead>
                     <tbody id="req-body" class="mono" data-empty-colspan="4" data-empty-message="No item here.">
@@ -170,7 +179,7 @@
                           <td class="py-1 px-2 text-center">
                             <xsl:call-template name="required-badge"/>
                           </td>
-                          <td class="py-1 px-2 text-center">
+                          <td class="py-1 px-2 w-16 pr-4">
                             <xsl:call-template name="row-actions">
                               <xsl:with-param name="accent" select="'var(--color-accent-primary)'"/>
                             </xsl:call-template>
@@ -193,7 +202,7 @@
                       <tr>
                         <th class="w-1/2 py-1 px-2 font-normal">FIELD NAME</th>
                         <th class="w-1/4 py-1 px-2 font-normal">TYPE</th>
-                        <th class="w-10 py-1 px-2"></th>
+                        <th class="w-16 py-1 px-2 pr-4 text-right"></th>
                       </tr>
                     </thead>
                     <tbody id="res-body" class="mono" data-empty-colspan="3" data-empty-message="No item here.">
@@ -205,7 +214,7 @@
                               <xsl:with-param name="current" select="@type"/>
                             </xsl:call-template>
                           </td>
-                          <td class="py-1 px-2 w-10 text-center">
+                          <td class="py-1 px-2 w-16 pr-4">
                             <xsl:call-template name="row-actions">
                               <xsl:with-param name="accent" select="'var(--color-accent-success)'"/>
                             </xsl:call-template>

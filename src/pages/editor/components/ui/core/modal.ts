@@ -29,24 +29,24 @@ const createModalShell = (title: string, description?: string) => {
   const previousOverflow = document.body.style.overflow
 
   const overlay = document.createElement('div')
-  overlay.className = 'fixed inset-0 z-[120] bg-[#0b0e14]/70 backdrop-blur-[1px] flex items-center justify-center p-4'
+  overlay.className = 'fixed inset-0 z-[120] bg-bg-base/70 backdrop-blur-[1px] flex items-center justify-center p-4'
 
   const panel = document.createElement('section')
-  panel.className = 'w-full max-w-md rounded-lg border border-[#292e42] bg-[#16161e] shadow-2xl'
+  panel.className = 'w-full max-w-md rounded-lg border border-border-strong bg-bg-panel shadow-2xl'
   panel.setAttribute('role', 'dialog')
   panel.setAttribute('aria-modal', 'true')
 
   const header = document.createElement('header')
-  header.className = 'px-4 py-3 border-b border-[#292e42]'
+  header.className = 'px-4 py-3 border-b border-border-strong'
 
   const heading = document.createElement('h2')
-  heading.className = 'text-sm font-bold text-[#c0caf5]'
+  heading.className = 'text-sm font-bold text-text-bright'
   heading.textContent = title
   header.appendChild(heading)
 
   if (description) {
     const paragraph = document.createElement('p')
-    paragraph.className = 'mt-1 text-xs text-[#9aa5ce]'
+    paragraph.className = 'mt-1 text-xs text-text-dim'
     paragraph.textContent = description
     header.appendChild(paragraph)
   }
@@ -55,7 +55,7 @@ const createModalShell = (title: string, description?: string) => {
   body.className = 'px-4 py-3'
 
   const footer = document.createElement('footer')
-  footer.className = 'px-4 py-3 border-t border-[#292e42] flex items-center justify-end gap-2'
+  footer.className = 'px-4 py-3 border-t border-border-strong flex items-center justify-end gap-2'
 
   panel.append(header, body, footer)
   overlay.appendChild(panel)
@@ -130,17 +130,17 @@ export const promptText = (options: PromptTextOptions): Promise<string | null> =
     input.type = 'text'
     input.value = options.defaultValue ?? ''
     input.placeholder = options.placeholder ?? ''
-    input.className = 'w-full rounded border border-[#3b4261] bg-[#1a1b26] px-3 py-2 text-sm text-[#c0caf5] outline-none focus:border-[#7aa2f7]'
+    input.className = 'w-full rounded border border-border-strong bg-bg-elevated px-3 py-2 text-sm text-text-bright outline-none focus:border-accent-primary'
     shell.body.appendChild(input)
 
     const cancelButton = document.createElement('button')
     cancelButton.type = 'button'
-    cancelButton.className = 'px-3 py-1.5 rounded text-xs font-semibold text-[#9aa5ce] bg-[#1f2335] hover:bg-[#292e42] transition-colors'
+    cancelButton.className = 'px-3 py-1.5 rounded text-xs font-semibold text-text-dim bg-bg-panel hover:bg-bg-elevated transition-colors'
     cancelButton.textContent = cancelLabel
 
     const confirmButton = document.createElement('button')
     confirmButton.type = 'button'
-    confirmButton.className = 'px-3 py-1.5 rounded text-xs font-semibold text-[#1a1b26] bg-[#7aa2f7] hover:bg-[#89b4fa] transition-colors'
+    confirmButton.className = 'px-3 py-1.5 rounded text-xs font-semibold text-bg-base bg-accent-primary hover:opacity-90 transition-opacity'
     confirmButton.textContent = confirmLabel
 
     shell.footer.append(cancelButton, confirmButton)
@@ -197,12 +197,12 @@ export const confirmAction = (options: ConfirmActionOptions): Promise<boolean> =
     const cancelLabel = options.cancelLabel ?? 'Cancel'
 
     const toneClass = options.tone === 'danger'
-      ? 'px-3 py-1.5 rounded text-xs font-semibold text-[#1a1b26] bg-[#f7768e] hover:bg-[#ff8fa3] transition-colors'
-      : 'px-3 py-1.5 rounded text-xs font-semibold text-[#1a1b26] bg-[#7aa2f7] hover:bg-[#89b4fa] transition-colors'
+      ? 'px-3 py-1.5 rounded text-xs font-semibold text-bg-base bg-accent-danger hover:opacity-90 transition-opacity'
+      : 'px-3 py-1.5 rounded text-xs font-semibold text-bg-base bg-accent-primary hover:opacity-90 transition-opacity'
 
     const cancelButton = document.createElement('button')
     cancelButton.type = 'button'
-    cancelButton.className = 'px-3 py-1.5 rounded text-xs font-semibold text-[#9aa5ce] bg-[#1f2335] hover:bg-[#292e42] transition-colors'
+    cancelButton.className = 'px-3 py-1.5 rounded text-xs font-semibold text-text-dim bg-bg-panel hover:bg-bg-elevated transition-colors'
     cancelButton.textContent = cancelLabel
 
     const confirmButton = document.createElement('button')
