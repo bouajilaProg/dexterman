@@ -1,44 +1,216 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <collection>
   <env>
-    <var name="API_URL" value="https://api.example.com" />
+    <var name="API_URL" value="https://api.shopwave.dev" />
+    <var name="CDN_URL" value="https://cdn.shopwave.dev" />
+    <var name="APP_ENV" value="staging" />
   </env>
-  <api name="rootapi" method="GET" path="/root">
+  <api name="health check" method="GET" path="/health">
     <request>
       <body>
       </body>
     </request>
     <response>
       <body>
+        <field name="status" type="string" />
+        <field name="uptime" type="number" />
+        <field name="version" type="string" />
       </body>
     </response>
   </api>
-  <group name="auth2">
-    <api name="users family" method="POST" path="/users/{family}">
+  <api name="site config" method="GET" path="/config/public">
+    <request>
+      <body>
+      </body>
+    </request>
+    <response>
+      <body>
+        <field name="siteName" type="string" />
+        <field name="supportEmail" type="string" />
+        <field name="currency" type="string" />
+      </body>
+    </response>
+  </api>
+  <group name="auth">
+    <api name="login" method="POST" path="/auth/login">
       <request>
         <body>
-          <field name="username" type="string" required="true" />
           <field name="email" type="string" required="true" />
           <field name="password" type="string" required="true" />
         </body>
       </request>
       <response>
         <body>
-          <field name="id" type="string" />
-          <field name="username" type="string" />
+          <field name="accessToken" type="string" />
+          <field name="refreshToken" type="string" />
+          <field name="expiresIn" type="number" />
+        </body>
+      </response>
+    </api>
+    <api name="register" method="POST" path="/auth/register">
+      <request>
+        <body>
+          <field name="firstName" type="string" required="true" />
+          <field name="lastName" type="string" required="true" />
+          <field name="email" type="string" required="true" />
+          <field name="password" type="string" required="true" />
+          <field name="marketingOptIn" type="boolean" required="false" />
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="userId" type="string" />
           <field name="email" type="string" />
+          <field name="createdAt" type="string" />
         </body>
       </response>
     </api>
   </group>
-  <group name="user">
-    <api name="users" method="GET" path="/users">
+  <group name="users">
+    <api name="profile" method="GET" path="/users/me">
       <request>
         <body>
         </body>
       </request>
       <response>
         <body>
+          <field name="id" type="string" />
+          <field name="firstName" type="string" />
+          <field name="lastName" type="string" />
+          <field name="email" type="string" />
+          <field name="role" type="string" />
+        </body>
+      </response>
+    </api>
+    <api name="update profile" method="PATCH" path="/users/me">
+      <request>
+        <body>
+          <field name="firstName" type="string" required="false" />
+          <field name="lastName" type="string" required="false" />
+          <field name="phone" type="string" required="false" />
+          <field name="avatarUrl" type="string" required="false" />
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="id" type="string" />
+          <field name="updatedAt" type="string" />
+        </body>
+      </response>
+    </api>
+  </group>
+  <group name="catalog">
+    <api name="list products" method="GET" path="/products">
+      <request>
+        <body>
+          <field name="query" type="string" required="false" />
+          <field name="category" type="string" required="false" />
+          <field name="minPrice" type="number" required="false" />
+          <field name="maxPrice" type="number" required="false" />
+          <field name="page" type="number" required="false" />
+          <field name="limit" type="number" required="false" />
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="items" type="array" />
+          <field name="total" type="number" />
+          <field name="page" type="number" />
+        </body>
+      </response>
+    </api>
+    <api name="product detail" method="GET" path="/products/{productId}">
+      <request>
+        <body>
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="id" type="string" />
+          <field name="title" type="string" />
+          <field name="description" type="string" />
+          <field name="price" type="number" />
+          <field name="inStock" type="boolean" />
+        </body>
+      </response>
+    </api>
+  </group>
+  <group name="cart">
+    <api name="get cart" method="GET" path="/cart">
+      <request>
+        <body>
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="id" type="string" />
+          <field name="items" type="array" />
+          <field name="subtotal" type="number" />
+          <field name="currency" type="string" />
+        </body>
+      </response>
+    </api>
+    <api name="add to cart" method="POST" path="/cart/items">
+      <request>
+        <body>
+          <field name="productId" type="string" required="true" />
+          <field name="quantity" type="number" required="true" />
+          <field name="variantId" type="string" required="false" />
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="cartId" type="string" />
+          <field name="itemCount" type="number" />
+          <field name="subtotal" type="number" />
+        </body>
+      </response>
+    </api>
+  </group>
+  <group name="orders">
+    <api name="checkout" method="POST" path="/checkout">
+      <request>
+        <body>
+          <field name="cartId" type="string" required="true" />
+          <field name="shippingAddressId" type="string" required="true" />
+          <field name="paymentMethodId" type="string" required="true" />
+          <field name="couponCode" type="string" required="false" />
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="orderId" type="string" />
+          <field name="status" type="string" />
+          <field name="total" type="number" />
+        </body>
+      </response>
+    </api>
+    <api name="order history" method="GET" path="/orders">
+      <request>
+        <body>
+          <field name="page" type="number" required="false" />
+          <field name="limit" type="number" required="false" />
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="orders" type="array" />
+          <field name="total" type="number" />
+        </body>
+      </response>
+    </api>
+  </group>
+  <group name="cms">
+    <api name="homepage blocks" method="GET" path="/cms/homepage">
+      <request>
+        <body>
+        </body>
+      </request>
+      <response>
+        <body>
+          <field name="hero" type="object" />
+          <field name="featuredProducts" type="array" />
+          <field name="announcements" type="array" />
         </body>
       </response>
     </api>

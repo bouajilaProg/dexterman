@@ -1,0 +1,78 @@
+<!-- @title pages/docs/page.html -->
+<!-- @descrption Base docs HTML shell that hosts the API docs accordion content. -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>Architect | API Docs</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body class="h-screen overflow-hidden bg-bg-base text-text-normal">
+    <div class="flex h-full">
+      <aside
+        class="w-12 flex flex-col items-center py-4 bg-bg-panel border-r border-border-subtle"
+      >
+        <a
+          href="/"
+          class="p-3 text-text-dim hover:text-text-bright transition-colors"
+          title="Back to editor"
+          aria-label="Back to editor"
+        >
+          <i data-lucide="folder-tree" class="w-5 h-5"></i>
+        </a>
+        <div
+          class="p-3 text-text-bright bg-bg-elevated"
+          title="API docs"
+          aria-label="API docs"
+        >
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+        </div>
+        <a
+          href="/"
+          class="mt-auto p-3 text-text-dim hover:text-text-bright transition-colors"
+          title="Back to editor"
+          aria-label="Back to editor"
+        >
+          <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </a>
+      </aside>
+
+      <main class="flex-1 overflow-y-auto">
+        <div class="mx-auto max-w-5xl px-4 py-6 md:px-8 md:py-10 space-y-4">
+          <header class="space-y-2 border-b border-border-subtle pb-4">
+            <a
+              href="/"
+              class="inline-flex items-center gap-2 text-xs text-text-dim hover:text-text-bright transition-colors"
+            >
+              <i data-lucide="arrow-left" class="w-4 h-4"></i>
+              Back to editor
+            </a>
+            <p
+              class="text-[10px] font-bold uppercase tracking-[0.22em] text-text-dim"
+            >
+              API Documentation
+            </p>
+            <h1 class="text-xl md:text-2xl font-bold text-text-bright">
+              Collection Endpoints
+            </h1>
+            <p class="text-xs text-text-dim">
+              Read-only single-page viewer with expandable endpoint cards.
+            </p>
+          </header>
+
+          <section id="docs" class="space-y-3"></section>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/docs/ui.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+      });
+    </script>
+  </body>
+</html>

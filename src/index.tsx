@@ -1,36 +1,66 @@
-import { serve } from '@hono/node-server'
-import { serveStatic } from '@hono/node-server/serve-static'
-import { Hono } from 'hono'
-import { editorDataEndpoint, editorEndpoint, editorSaveEndpoint } from './pages/editor/editor.js'
+import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { Hono } from "hono";
+import { docsEndpoint, docsExecuteEndpoint } from "./pages/docs/docs.js";
+import {
+  editorDataEndpoint,
+  editorEndpoint,
+  editorSaveEndpoint,
+} from "./pages/editor/editor.js";
 
-const app = new Hono()
+const app = new Hono();
 
-app.use('/styles.css', serveStatic({
-  root: './public'
-}))
+app.use(
+  "/styles.css",
+  serveStatic({
+    root: "./public",
+  }),
+);
 
-app.use('/editor/*', serveStatic({
-  root: './dist/pages/editor',
-  rewriteRequestPath: (path) => path.replace(/^\/editor/, '')
-}))
+app.use(
+  "/editor/*",
+  serveStatic({
+    root: "./dist/pages/editor",
+    rewriteRequestPath: (path) => path.replace(/^\/editor/, ""),
+  }),
+);
 
-app.use('/editor.js', serveStatic({
-  root: './dist/pages/editor',
-  rewriteRequestPath: () => '/ui.js'
-}))
+app.use(
+  "/docs/*",
+  serveStatic({
+    root: "./dist/pages/docs",
+    rewriteRequestPath: (path) => path.replace(/^\/docs/, ""),
+  }),
+);
 
-app.use('/components/*', serveStatic({
-  root: './dist/pages/editor'
-}))
+app.use(
+  "/editor.js",
+  serveStatic({
+    root: "./dist/pages/editor",
+    rewriteRequestPath: () => "/ui.js",
+  }),
+);
 
-app.get('/', editorEndpoint)
-app.get('/editor/data', editorDataEndpoint)
-app.post('/editor/save', editorSaveEndpoint)
-app.get('/health', (c) => c.text('ok'))
+app.use(
+  "/components/*",
+  serveStatic({
+    root: "./dist/pages/editor",
+  }),
+);
 
-serve({
-  fetch: app.fetch,
-  port: 3000
-}, (info) => {
-  console.log(`Server is running on http://localhost:${info.port}`)
-})
+app.get("/", editorEndpoint);
+app.get("/docs", docsEndpoint);
+app.get("/editor/data", editorDataEndpoint);
+app.post("/editor/save", editorSaveEndpoint);
+app.post("/docs/execute", docsExecuteEndpoint);
+app.get("/health", (c) => c.text("ok"));
+
+serve(
+  {
+    fetch: app.fetch,
+    port: 3000,
+  },
+  (info) => {
+    console.log(`Server is running on http://localhost:${info.port}`);
+  },
+);

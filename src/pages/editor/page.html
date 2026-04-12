@@ -1,60 +1,73 @@
 <!-- @title pages/editor/page.html -->
 <!-- @descrption Base editor HTML shell that hosts sidebar and editor placeholders before server-side embedding. -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>Architect | Docs</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/styles.css">
-  <title>Architect | Docs</title>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <style>
-    body {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      background-color: var(--color-bg-base);
-      color: var(--color-text-normal);
-    }
+    <style>
+      body {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        background-color: var(--color-bg-base);
+        color: var(--color-text-normal);
+      }
 
-    
+      [data-folder-list]:empty::before {
+        content: "Empty folder";
+        display: block;
+        padding: 0.5rem;
+        font-size: 0.7rem;
+        color: var(--color-text-dim);
+        font-style: italic;
+        text-align: center;
+      }
+    </style>
+  </head>
 
-    [data-folder-list]:empty::before {
-      content: 'Empty folder';
-      display: block;
-      padding: 0.5rem;
-      font-size: 0.7rem;
-      color: var(--color-text-dim);
-      font-style: italic;
-      text-align: center;
-    }
-  </style>
-</head>
+  <body class="h-screen overflow-hidden bg-bg-base text-text-normal">
+    <div class="flex h-full">
+      <aside
+        class="w-12 flex flex-col items-center py-4 bg-bg-panel border-r border-border-subtle"
+      >
+        <div class="p-3 text-text-bright bg-bg-elevated">
+          <i data-lucide="folder-tree" class="w-5 h-5"></i>
+        </div>
+        <a
+          href="/docs"
+          class="p-3 text-text-dim hover:text-text-bright transition-colors"
+          title="Open API docs"
+          aria-label="Open API docs"
+        >
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+        </a>
+        <div
+          class="p-3 text-text-dim hover:text-text-bright transition-colors cursor-pointer"
+        >
+          <i data-lucide="history" class="w-5 h-5"></i>
+        </div>
+        <div
+          class="mt-auto p-3 text-text-dim hover:text-text-bright transition-colors cursor-pointer"
+        >
+          <i data-lucide="settings" class="w-5 h-5"></i>
+        </div>
+      </aside>
 
-<body class="h-screen overflow-hidden bg-bg-base text-text-normal">
-  <div class="flex h-full">
-    <aside class="w-12 flex flex-col items-center py-4 bg-bg-panel border-r border-border-subtle">
-      <div class="p-3 text-text-bright bg-bg-elevated"><i data-lucide="folder-tree"
-          class="w-5 h-5"></i></div>
-      <div class="p-3 text-text-dim hover:text-text-bright transition-colors cursor-pointer"><i data-lucide="history"
-          class="w-5 h-5"></i></div>
-      <div class="p-3 text-text-dim hover:text-text-bright transition-colors cursor-pointer"><i data-lucide="cloud"
-          class="w-5 h-5"></i></div>
-      <div class="mt-auto p-3 text-text-dim hover:text-text-bright transition-colors cursor-pointer"><i
-          data-lucide="settings" class="w-5 h-5"></i></div>
-    </aside>
+      <div class="h-full" id="sidebar"></div>
+      <div id="editor" class="flex-1"></div>
+    </div>
 
-    <div class="h-full" id="sidebar"></div>
-    <div id="editor" class="flex-1"></div>
-  </div>
-
-  <script type="module" src="/editor/ui.js"></script>
-  <script>
-    // run lucid code
-    document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-    });
-  </script>
-</body>
-
+    <script type="module" src="/editor/ui.js"></script>
+    <script>
+      // run lucid code
+      document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+      });
+    </script>
+  </body>
 </html>
