@@ -4,6 +4,7 @@
  */
 import { attachEditor } from './components/ui/editor.js'
 import type { ApiDropPayload } from './components/ui/drag-drop.js'
+import { confirmAction, promptText } from './components/ui/core/modal.js'
 import { loadEditorData, saveEditorData } from './editor-client.js'
 import type { EditorApi, EditorData, EditorField, EditorFolder } from './lib/editor-data.js'
 
@@ -191,15 +192,36 @@ const validateDataForSelectionPaths = (data: EditorData) => {
 }
 
 /**
- * @title getPromptName
- * @description Reads and trims prompt input while preserving cancel behavior.
+ * @title getModalName
+ * @description Opens modal text input and returns trimmed value or null.
  */
-const getPromptName = (label: string, defaultValue: string) => {
-  const raw = window.prompt(label, defaultValue)
+const getModalName = async (label: string, defaultValue: string) => {
+  const raw = await promptText({
+    title: label,
+    defaultValue,
+    confirmLabel: 'Save',
+    cancelLabel: 'Cancel'
+  })
+
   if (raw === null) {
     return null
   }
+
   return raw.trim()
+}
+
+/**
+ * @title confirmWithModal
+ * @description Opens confirmation modal and resolves explicit confirmation state.
+ */
+const confirmWithModal = (title: string, description: string) => {
+  return confirmAction({
+    title,
+    description,
+    confirmLabel: 'Delete',
+    cancelLabel: 'Cancel',
+    tone: 'danger'
+  })
 }
 
 /**
@@ -489,7 +511,7 @@ const newFolder = async () => {
   const data = await ensureCachedData()
   const currentFolders = data.folders ?? []
   const suggestedName = buildUniqueName(currentFolders.map((folder) => folder.name), 'folder')
-  const nextName = getPromptName('Folder name', suggestedName)
+  const nextName = await getModalName('Folder name', suggestedName)
   if (nextName === null) {
     return
   }
@@ -523,7 +545,7 @@ const renameFolder = async (folderName: string) => {
     throw new Error(`Folder '${trimmedFolderName}' was not found`)
   }
 
-  const nextName = getPromptName('Rename folder', target.name)
+  const nextName = await getModalName('Rename folder', target.name)
   if (nextName === null || nextName === target.name) {
     return
   }
@@ -554,7 +576,10 @@ const deleteFolder = async (folderName: string) => {
     throw new Error('Folder name is missing')
   }
 
-  if (!window.confirm(`Delete folder '${trimmedFolderName}' and all its APIs?`)) {
+  if (!await confirmWithModal(
+    'Delete folder',
+    `Delete folder '${trimmedFolderName}' and all its APIs?`
+  )) {
     return
   }
 
@@ -604,7 +629,7 @@ const newRootApi = async () => {
   nextData.apis = nextData.apis ?? []
 
   const suggestedName = buildUniqueName(nextData.apis.map((api) => api.name), 'api')
-  const nextApiName = getPromptName('Root API name', suggestedName)
+  const nextApiName = await getModalName('Root API name', suggestedName)
   if (nextApiName === null) {
     return
   }
@@ -629,7 +654,10 @@ const deleteRootApi = async (apiName: string) => {
     throw new Error('API name is missing')
   }
 
-  if (!window.confirm(`Delete root API '${trimmedApiName}'?`)) {
+  if (!await confirmWithModal(
+    'Delete root API',
+    `Delete root API '${trimmedApiName}'?`
+  )) {
     return
   }
 
@@ -676,7 +704,7 @@ const newApi = async (folderName: string) => {
 
   targetFolder.apis = targetFolder.apis ?? []
   const suggestedName = buildUniqueName(targetFolder.apis.map((api) => api.name), 'api')
-  const nextApiName = getPromptName(`API name for folder '${trimmedFolderName}'`, suggestedName)
+  const nextApiName = await getModalName(`API name for folder '${trimmedFolderName}'`, suggestedName)
   if (nextApiName === null) {
     return
   }
@@ -702,7 +730,10 @@ const deleteApi = async (folderName: string, apiName: string) => {
     throw new Error('Folder name or API name is missing')
   }
 
-  if (!window.confirm(`Delete API '${trimmedApiName}' from folder '${trimmedFolderName}'?`)) {
+  if (!await confirmWithModal(
+    'Delete API',
+    `Delete API '${trimmedApiName}' from folder '${trimmedFolderName}'?`
+  )) {
     return
   }
 
