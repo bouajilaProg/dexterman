@@ -3,22 +3,18 @@
   <env>
     <var name="API_URL" value="https://api.example.com" />
   </env>
-  <group name="auth">
-    <api name="login" method="POST" path="/auth/login/imed">
-      <request>
-        <body>
-          <field name="imed" type="string" required="true" />
-          <field name="password" type="string" required="true" />
-        </body>
-      </request>
-      <response>
-        <body>
-        </body>
-      </response>
-    </api>
-  </group>
-  <group name="users">
-    <api name="user" method="POST" path="/users/{family}">
+  <api name="rootapi" method="GET" path="/root">
+    <request>
+      <body>
+      </body>
+    </request>
+    <response>
+      <body>
+      </body>
+    </response>
+  </api>
+  <group name="auth2">
+    <api name="users family" method="POST" path="/users/{family}">
       <request>
         <body>
           <field name="username" type="string" required="true" />
@@ -31,6 +27,18 @@
           <field name="id" type="string" />
           <field name="username" type="string" />
           <field name="email" type="string" />
+        </body>
+      </response>
+    </api>
+  </group>
+  <group name="user">
+    <api name="users" method="GET" path="/users">
+      <request>
+        <body>
+        </body>
+      </request>
+      <response>
+        <body>
         </body>
       </response>
     </api>

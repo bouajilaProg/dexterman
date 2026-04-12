@@ -21,25 +21,25 @@
       </xsl:choose>
     </xsl:variable>
 
-    <aside class="h-full w-72 bg-[#16161e] border-r border-[#292e42] flex flex-col">
-      <div class="h-12 flex items-center justify-between px-4 border-b border-[#292e42]">
+    <aside class="h-full w-72 bg-bg-panel border-r border-border-subtle flex flex-col">
+      <div class="h-10 flex items-center justify-between px-3 border-b border-border-subtle">
         <div>
-          <p class="text-[10px] font-bold text-[#565f89] uppercase tracking-widest">Collections</p>
-          <p class="text-[10px] text-[#565f89]">
+          <p class="text-[10px] font-bold text-text-dim uppercase tracking-widest">Collections</p>
+          <p class="text-[10px] text-text-dim">
             <xsl:value-of select="$selectedLabel"/>
           </p>
         </div>
         <div class="flex items-center gap-2">
-          <button class="text-[#565f89] hover:text-[#7aa2f7] transition-colors" data-handler="new-folder" title="New folder">
+          <button class="text-text-dim hover:text-accent-primary transition-colors" data-handler="new-folder" title="New folder">
             <i data-lucide="folder-plus" class="w-4 h-4"></i>
           </button>
-          <button class="text-[#565f89] hover:text-[#7aa2f7] transition-colors" data-handler="new-root-api" title="New root API">
+          <button class="text-text-dim hover:text-accent-primary transition-colors" data-handler="new-root-api" title="New root API">
             <i data-lucide="plus" class="w-3 h-3"></i>
           </button>
         </div>
       </div>
 
-      <div class="p-2 space-y-2 overflow-y-auto">
+      <div class="py-2 space-y-0.5 overflow-y-auto">
         <xsl:for-each select="/collection/api">
           <div data-api-item="" data-api-name="{@name}" data-api-path="{@path}" draggable="false">
             <xsl:if test="@selected='true'">
@@ -48,10 +48,10 @@
             <xsl:attribute name="class">
               <xsl:choose>
                 <xsl:when test="@selected='true'">
-                  p-2 text-xs bg-[#7aa2f7]/10 border-l-2 border-[#7aa2f7] flex items-center rounded
+                  p-1 px-2 text-xs bg-bg-elevated flex items-center rounded
                 </xsl:when>
                 <xsl:otherwise>
-                  p-2 text-xs bg-[#1a1b26] border-l-2 border-[#9ece6a] flex items-center rounded
+                  p-1 px-2 text-xs bg-transparent bg-transparent flex items-center rounded
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
@@ -61,21 +61,21 @@
                 <xsl:attribute name="class">
                   <xsl:text>text-[9px] font-black mr-2 </xsl:text>
                   <xsl:choose>
-                    <xsl:when test="@method = 'GET'">text-[#7dcfff]</xsl:when>
-                    <xsl:when test="@method = 'POST'">text-[#7aa2f7]</xsl:when>
-                    <xsl:when test="@method = 'PUT'">text-[#e0af68]</xsl:when>
-                    <xsl:otherwise>text-[#f7768e]</xsl:otherwise>
+                    <xsl:when test="@method = 'GET'">text-text-bright</xsl:when>
+                    <xsl:when test="@method = 'POST'">text-accent-primary</xsl:when>
+                    <xsl:when test="@method = 'PUT'">text-accent-warning</xsl:when>
+                    <xsl:otherwise>text-accent-danger</xsl:otherwise>
                   </xsl:choose>
                 </xsl:attribute>
                 <xsl:value-of select="@method"/>
               </span>
 
               <span class="truncate"><xsl:value-of select="@name"/></span>
-              <span class="ml-auto text-[#565f89] truncate max-w-[80px]">
+              <span class="ml-auto text-text-dim truncate max-w-[80px]">
                 <xsl:value-of select="@path"/>
               </span>
             </a>
-            <button class="ml-2 text-[#565f89] hover:text-[#f7768e] transition-colors" data-handler="delete-root-api" data-api-name="{@name}" title="Delete API">
+            <button class="ml-2 text-text-dim hover:text-accent-danger transition-colors" data-handler="delete-root-api" data-api-name="{@name}" title="Delete API">
               <i data-lucide="trash-2" class="w-3 h-3"></i>
             </button>
           </div>
@@ -83,17 +83,17 @@
 
         <xsl:for-each select="/collection/group">
           <details open="open" class="group" data-folder-dropzone="" data-folder-name="{@name}">
-            <summary class="flex items-center p-2 text-xs font-bold text-[#565f89] uppercase cursor-pointer list-none rounded hover:bg-[#1f2335] transition-colors gap-2">
+            <summary class="flex items-center p-1 px-2 text-xs font-bold text-text-dim uppercase cursor-pointer list-none rounded hover:bg-bg-elevated transition-colors gap-2">
               <i data-lucide="chevron-down" class="w-3 h-3 group-open:rotate-0 -rotate-90 transition-transform"></i>
               <span class="truncate"><xsl:value-of select="@name"/></span>
               <span class="ml-auto flex items-center gap-1">
-                <button class="text-[#565f89] hover:text-[#7aa2f7] transition-colors" data-handler="new-api" data-folder-name="{@name}" title="New API">
+                <button class="text-text-dim hover:text-accent-primary transition-colors" data-handler="new-api" data-folder-name="{@name}" title="New API">
                   <i data-lucide="plus" class="w-3 h-3"></i>
                 </button>
-                <button class="text-[#565f89] hover:text-[#7aa2f7] transition-colors" data-handler="rename-folder" data-folder-name="{@name}" title="Rename folder">
+                <button class="text-text-dim hover:text-accent-primary transition-colors" data-handler="rename-folder" data-folder-name="{@name}" title="Rename folder">
                   <i data-lucide="pencil" class="w-3 h-3"></i>
                 </button>
-                <button class="text-[#565f89] hover:text-[#f7768e] transition-colors" data-handler="delete-folder" data-folder-name="{@name}" title="Delete folder">
+                <button class="text-text-dim hover:text-accent-danger transition-colors" data-handler="delete-folder" data-folder-name="{@name}" title="Delete folder">
                   <i data-lucide="trash-2" class="w-3 h-3"></i>
                 </button>
               </span>
@@ -108,10 +108,10 @@
                   <xsl:attribute name="class">
                     <xsl:choose>
                       <xsl:when test="@selected='true'">
-                        p-2 text-xs bg-[#7aa2f7]/10 border-l-2 border-[#7aa2f7] flex items-center rounded cursor-move
+                        p-1 px-2 text-xs bg-bg-elevated flex items-center rounded cursor-move
                       </xsl:when>
                       <xsl:otherwise>
-                        p-2 text-xs bg-[#1a1b26] border-l-2 border-[#9ece6a] flex items-center rounded cursor-move
+                        p-1 px-2 text-xs bg-transparent bg-transparent flex items-center rounded cursor-move
                       </xsl:otherwise>
                     </xsl:choose>
                   </xsl:attribute>
@@ -121,21 +121,21 @@
                       <xsl:attribute name="class">
                         <xsl:text>text-[9px] font-black mr-2 </xsl:text>
                         <xsl:choose>
-                          <xsl:when test="@method = 'GET'">text-[#7dcfff]</xsl:when>
-                          <xsl:when test="@method = 'POST'">text-[#7aa2f7]</xsl:when>
-                          <xsl:when test="@method = 'PUT'">text-[#e0af68]</xsl:when>
-                          <xsl:otherwise>text-[#f7768e]</xsl:otherwise>
+                          <xsl:when test="@method = 'GET'">text-text-bright</xsl:when>
+                          <xsl:when test="@method = 'POST'">text-accent-primary</xsl:when>
+                          <xsl:when test="@method = 'PUT'">text-accent-warning</xsl:when>
+                          <xsl:otherwise>text-accent-danger</xsl:otherwise>
                         </xsl:choose>
                       </xsl:attribute>
                       <xsl:value-of select="@method"/>
                     </span>
 
                     <span class="truncate"><xsl:value-of select="@name"/></span>
-                    <span class="ml-auto text-[#565f89] truncate max-w-[80px]">
+                    <span class="ml-auto text-text-dim truncate max-w-[80px]">
                       <xsl:value-of select="@path"/>
                     </span>
                   </a>
-                  <button class="ml-2 text-[#565f89] hover:text-[#f7768e] transition-colors" data-handler="delete-api" data-folder-name="{../@name}" data-api-name="{@name}" title="Delete API">
+                  <button class="ml-2 text-text-dim hover:text-accent-danger transition-colors" data-handler="delete-api" data-folder-name="{../@name}" data-api-name="{@name}" title="Delete API">
                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                   </button>
                 </div>
@@ -144,14 +144,14 @@
           </details>
         </xsl:for-each>
       </div>
-      <div class="border-t border-[#292e42] p-4">
+      <div class="border-t border-border-subtle p-4">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[10px] font-bold text-[#565f89] uppercase tracking-widest">Environment</span>
-          <button class="text-[#565f89] hover:text-[#7aa2f7] transition-colors text-[10px] font-bold" data-handler="env-page">
+          <span class="text-[10px] font-bold text-text-dim uppercase tracking-widest">Environment</span>
+          <button class="text-text-dim hover:text-accent-primary transition-colors text-[10px] font-bold" data-handler="env-page">
             OPEN
           </button>
         </div>
-        <div class="text-[11px] text-[#565f89]">Environment editor coming soon.</div>
+        <div class="text-[11px] text-text-dim">Environment editor coming soon.</div>
       </div>
     </aside>
   </xsl:template>
