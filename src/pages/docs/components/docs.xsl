@@ -78,11 +78,22 @@
 
     <xsl:template match="api">
         <xsl:param name="group"/>
+        <xsl:variable name="method" select="@method"/>
 
         <details class="border border-border-subtle bg-bg-panel open:border-border-strong">
             <summary class="py-3 px-4 cursor-pointer">
                 <div class="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
-                    <span class="inline-flex w-fit items-center rounded border px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase text-accent-primary border-accent-primary/40 bg-accent-primary/10">
+                    <span>
+                        <xsl:attribute name="class">
+                            <xsl:text>inline-flex w-fit items-center rounded border px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase </xsl:text>
+                            <xsl:choose>
+                                <xsl:when test="$method = 'GET'">text-accent-success border-accent-success/40 bg-accent-success/10</xsl:when>
+                                <xsl:when test="$method = 'POST'">text-accent-primary border-accent-primary/40 bg-accent-primary/10</xsl:when>
+                                <xsl:when test="$method = 'PUT'">text-accent-warning border-accent-warning/40 bg-accent-warning/10</xsl:when>
+                                <xsl:when test="$method = 'PATCH'">text-text-bright border-border-strong bg-bg-elevated</xsl:when>
+                                <xsl:otherwise>text-accent-danger border-accent-danger/40 bg-accent-danger/10</xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:attribute>
                         <xsl:value-of select="@method"/>
                     </span>
                     <code class="text-[12px] text-text-bright break-all">
@@ -130,7 +141,17 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
-                    <button class="border border-accent-primary/40 bg-accent-primary/10 px-3 py-1.5 text-xs font-semibold text-accent-primary hover:bg-accent-primary/20" data-execute="">
+                    <button data-execute="">
+                        <xsl:attribute name="class">
+                            <xsl:text>border px-3 py-1.5 text-xs font-semibold transition-colors </xsl:text>
+                            <xsl:choose>
+                                <xsl:when test="$method = 'GET'">border-accent-success/40 bg-accent-success/10 text-accent-success hover:bg-accent-success/20</xsl:when>
+                                <xsl:when test="$method = 'POST'">border-accent-primary/40 bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20</xsl:when>
+                                <xsl:when test="$method = 'PUT'">border-accent-warning/40 bg-accent-warning/10 text-accent-warning hover:bg-accent-warning/20</xsl:when>
+                                <xsl:when test="$method = 'PATCH'">border-border-strong bg-bg-elevated text-text-bright hover:bg-bg-panel</xsl:when>
+                                <xsl:otherwise>border-accent-danger/40 bg-accent-danger/10 text-accent-danger hover:bg-accent-danger/20</xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:attribute>
                         <xsl:attribute name="data-method">
                             <xsl:value-of select="@method"/>
                         </xsl:attribute>

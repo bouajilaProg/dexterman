@@ -9,6 +9,27 @@ type ExecuteResponse = {
   error?: string;
 };
 
+const ENV_STORAGE_KEY = "dexterman:env-vars";
+
+const getEnvVars = (): Record<string, string> => {
+  try {
+    const raw = window.localStorage.getItem(ENV_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object") return {};
+
+    const vars: Record<string, string> = {};
+    for (const [key, value] of Object.entries(
+      parsed as Record<string, unknown>,
+    )) {
+      vars[key] = typeof value === "string" ? value : " ";
+    }
+    return vars;
+  } catch {
+    return {};
+  }
+};
+
 const parseFieldValue = (raw: string, type: string) => {
   const trimmed = raw.trim();
   if (trimmed === "") return "";
@@ -23,13 +44,24 @@ const parseFieldValue = (raw: string, type: string) => {
   }
 
   if (normalizedType === "boolean") {
-    if (trimmed === "true") return true;
-    if (trimmed === "false") return false;
+    const normalized = trimmed.toLowerCase();
+    if (normalized === "true") return true;
+    if (normalized === "false") return false;
     throw new Error(`Invalid boolean value: ${trimmed}`);
   }
 
   if (normalizedType === "object" || normalizedType === "array") {
-    return JSON.parse(trimmed) as unknown;
+    const parsed = JSON.parse(trimmed) as unknown;
+    if (
+      normalizedType === "object" &&
+      (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))
+    ) {
+      throw new Error(`Field expects object, got ${trimmed}`);
+    }
+    if (normalizedType === "array" && !Array.isArray(parsed)) {
+      throw new Error(`Field expects array, got ${trimmed}`);
+    }
+    return parsed;
   }
 
   return trimmed;
@@ -53,13 +85,21 @@ const buildBodyFromInputs = (card: Element) => {
     }
 
     if (raw.trim() === "") {
+      field.classList.remove("border-accent-danger");
       if (required) {
+        field.classList.add("border-accent-danger");
         throw new Error(`Field '${name}' is required`);
       }
       continue;
     }
 
-    entries[name] = parseFieldValue(raw, type);
+    try {
+      entries[name] = parseFieldValue(raw, type);
+      field.classList.remove("border-accent-danger");
+    } catch (error) {
+      field.classList.add("border-accent-danger");
+      throw error;
+    }
   }
 
   return entries;
@@ -112,6 +152,7 @@ const executeFromCard = async (button: HTMLButtonElement) => {
 
   try {
     const body = buildBodyFromInputs(card);
+    const vars = getEnvVars();
     button.disabled = true;
     setStatus(status, "Executing...", "busy");
 
@@ -120,7 +161,7 @@ const executeFromCard = async (button: HTMLButtonElement) => {
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ url, method, body }),
+      body: JSON.stringify({ url, method, body, vars }),
     });
 
     const payload = (await response.json()) as ExecuteResponse;

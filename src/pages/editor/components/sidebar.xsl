@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- @title pages/editor/components/sidebar.xsl -->
 <!-- @descrption XSLT template that renders root APIs and folder/API tree from collection XML. -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="html" omit-xml-declaration="yes"/>
 
   <xsl:template match="/">
@@ -70,7 +71,9 @@
                 <xsl:value-of select="@method"/>
               </span>
 
-              <span class="truncate"><xsl:value-of select="@name"/></span>
+              <span class="truncate">
+                <xsl:value-of select="@name"/>
+              </span>
               <span class="ml-auto text-text-dim truncate max-w-[80px]">
                 <xsl:value-of select="@path"/>
               </span>
@@ -85,7 +88,9 @@
           <details open="open" class="group" data-folder-dropzone="" data-folder-name="{@name}">
             <summary class="flex items-center p-1 px-2 text-xs font-bold text-text-dim uppercase cursor-pointer list-none rounded hover:bg-bg-elevated transition-colors gap-2">
               <i data-lucide="chevron-down" class="w-3 h-3 group-open:rotate-0 -rotate-90 transition-transform"></i>
-              <span class="truncate"><xsl:value-of select="@name"/></span>
+              <span class="truncate">
+                <xsl:value-of select="@name"/>
+              </span>
               <span class="ml-auto flex items-center gap-1">
                 <button class="text-text-dim hover:text-accent-primary transition-colors" data-handler="new-api" data-folder-name="{@name}" title="New API">
                   <i data-lucide="plus" class="w-3 h-3"></i>
@@ -130,7 +135,9 @@
                       <xsl:value-of select="@method"/>
                     </span>
 
-                    <span class="truncate"><xsl:value-of select="@name"/></span>
+                    <span class="truncate">
+                      <xsl:value-of select="@name"/>
+                    </span>
                     <span class="ml-auto text-text-dim truncate max-w-[80px]">
                       <xsl:value-of select="@path"/>
                     </span>
@@ -143,15 +150,6 @@
             </div>
           </details>
         </xsl:for-each>
-      </div>
-      <div class="border-t border-border-subtle p-4">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-[10px] font-bold text-text-dim uppercase tracking-widest">Environment</span>
-          <button class="text-text-dim hover:text-accent-primary transition-colors text-[10px] font-bold" data-handler="env-page">
-            OPEN
-          </button>
-        </div>
-        <div class="text-[11px] text-text-dim">Environment editor coming soon.</div>
       </div>
     </aside>
   </xsl:template>

@@ -6,7 +6,7 @@ import type { Context } from "hono";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { apiCall } from "../../lib/runner.js";
+import { apiCall, type ApiVariables } from "../../lib/runner.js";
 import { embed, transformXmlWithPath } from "../../lib/transform.js";
 
 const isDev = fileURLToPath(import.meta.url).includes("/src/");
@@ -21,6 +21,7 @@ type ExecutePayload = {
   url?: string;
   method?: string;
   body?: unknown;
+  vars?: ApiVariables;
 };
 
 const ALLOWED_METHODS = new Set<ExecuteMethod>([
@@ -45,12 +46,7 @@ const normalizeUrl = (value: unknown) => {
     throw new Error("Endpoint URL is required");
   }
 
-  const parsed = new URL(url);
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new Error("Only http/https protocols are allowed");
-  }
-
-  return parsed.toString();
+  return url;
 };
 
 /**
@@ -103,8 +99,9 @@ export async function docsExecuteEndpoint(c: Context) {
     const url = normalizeUrl(payload.url);
     const method = normalizeMethod(payload.method);
     const body = payload.body ?? {};
+    const vars = payload.vars ?? {};
 
-    const result = await apiCall<unknown>(url, method, body);
+    const result = await apiCall<unknown>(url, method, body, { vars });
     return c.json({ ok: true, result });
   } catch (error) {
     const message =

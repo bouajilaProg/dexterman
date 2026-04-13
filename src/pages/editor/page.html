@@ -46,11 +46,15 @@
         >
           <i data-lucide="book-open" class="w-5 h-5"></i>
         </a>
-        <div
+        <button
+          type="button"
+          data-env-toggle=""
           class="p-3 text-text-dim hover:text-text-bright transition-colors cursor-pointer"
+          title="Environment variables"
+          aria-label="Environment variables"
         >
-          <i data-lucide="history" class="w-5 h-5"></i>
-        </div>
+          <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+        </button>
         <div
           class="mt-auto p-3 text-text-dim hover:text-text-bright transition-colors cursor-pointer"
         >
@@ -60,6 +64,58 @@
 
       <div class="h-full" id="sidebar"></div>
       <div id="editor" class="flex-1"></div>
+
+      <aside
+        id="env-panel"
+        class="fixed top-0 right-0 h-full w-96 max-w-[85vw] bg-bg-panel border-l border-border-subtle translate-x-full transition-transform duration-200 z-10"
+        aria-hidden="true"
+      >
+        <div class="h-full flex flex-col">
+          <div
+            class="flex items-center justify-between p-4 border-b border-border-subtle"
+          >
+            <div>
+              <p
+                class="text-[10px] font-bold text-text-dim uppercase tracking-widest"
+              >
+                Environment
+              </p>
+              <p class="text-xs text-text-dim">
+                Use variables in docs as {{VAR_NAME}}
+              </p>
+            </div>
+            <button
+              type="button"
+              data-env-close=""
+              class="text-text-dim hover:text-text-bright transition-colors"
+              aria-label="Close environment panel"
+            >
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="p-4 space-y-3 overflow-y-auto" id="env-rows"></div>
+
+          <div
+            class="p-4 border-t border-border-subtle flex items-center justify-between gap-2"
+          >
+            <button
+              type="button"
+              data-env-add=""
+              class="text-xs px-3 py-1.5 border border-border-subtle text-text-normal hover:bg-bg-elevated transition-colors"
+            >
+              Add variable
+            </button>
+            <button
+              type="button"
+              data-env-save=""
+              class="text-xs px-3 py-1.5 bg-accent-primary text-bg-base font-semibold hover:bg-accent-primary/80 transition-colors"
+            >
+              Save env
+            </button>
+          </div>
+        </div>
+      </aside>
     </div>
 
     <script type="module" src="/editor/ui.js"></script>
