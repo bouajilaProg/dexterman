@@ -15,6 +15,98 @@ import type {
 
 const ENV_STORAGE_KEY = "dexterman:env-vars";
 
+type MethodTheme = {
+  text: string;
+  textHover: string;
+  softBg: string;
+  solidBg: string;
+  solidHoverBg: string;
+  focusText: string;
+};
+
+const METHOD_THEMES: Record<string, MethodTheme> = {
+  GET: {
+    text: "text-accent-success",
+    textHover: "hover:text-accent-success",
+    softBg: "bg-accent-success/20",
+    solidBg: "bg-accent-success",
+    solidHoverBg: "hover:bg-accent-success/80",
+    focusText: "focus:text-accent-success",
+  },
+  POST: {
+    text: "text-accent-primary",
+    textHover: "hover:text-accent-primary",
+    softBg: "bg-accent-primary/20",
+    solidBg: "bg-accent-primary",
+    solidHoverBg: "hover:bg-accent-primary/80",
+    focusText: "focus:text-accent-primary",
+  },
+  PUT: {
+    text: "text-accent-warning",
+    textHover: "hover:text-accent-warning",
+    softBg: "bg-accent-warning/20",
+    solidBg: "bg-accent-warning",
+    solidHoverBg: "hover:bg-accent-warning/80",
+    focusText: "focus:text-accent-warning",
+  },
+  DELETE: {
+    text: "text-accent-danger",
+    textHover: "hover:text-accent-danger",
+    softBg: "bg-accent-danger/20",
+    solidBg: "bg-accent-danger",
+    solidHoverBg: "hover:bg-accent-danger/80",
+    focusText: "focus:text-accent-danger",
+  },
+};
+
+const THEME_TEXT_CLASSES = [
+  "text-accent-success",
+  "text-accent-primary",
+  "text-accent-warning",
+  "text-accent-danger",
+  "text-text-bright",
+];
+
+const THEME_HOVER_TEXT_CLASSES = [
+  "hover:text-accent-success",
+  "hover:text-accent-primary",
+  "hover:text-accent-warning",
+  "hover:text-accent-danger",
+  "hover:text-text-bright",
+];
+
+const THEME_SOFT_BG_CLASSES = [
+  "bg-accent-success/20",
+  "bg-accent-primary/20",
+  "bg-accent-warning/20",
+  "bg-accent-danger/20",
+  "bg-bg-elevated",
+];
+
+const THEME_SOLID_BG_CLASSES = [
+  "bg-accent-success",
+  "bg-accent-primary",
+  "bg-accent-warning",
+  "bg-accent-danger",
+  "bg-bg-elevated",
+];
+
+const THEME_HOVER_BG_CLASSES = [
+  "hover:bg-accent-success/80",
+  "hover:bg-accent-primary/80",
+  "hover:bg-accent-warning/80",
+  "hover:bg-accent-danger/80",
+  "hover:bg-bg-panel",
+];
+
+const THEME_FOCUS_TEXT_CLASSES = [
+  "focus:text-accent-success",
+  "focus:text-accent-primary",
+  "focus:text-accent-warning",
+  "focus:text-accent-danger",
+  "focus:text-text-bright",
+];
+
 type EnvEntry = {
   key: string;
   value: string;
@@ -182,6 +274,110 @@ const getErrorMessage = (error: unknown) =>
  */
 const showError = (error: unknown) => {
   window.alert(getErrorMessage(error));
+};
+
+const getMethodTheme = (methodRaw?: string): MethodTheme => {
+  const key = methodRaw?.toUpperCase() ?? "";
+  return METHOD_THEMES[key] ?? METHOD_THEMES.POST;
+};
+
+/**
+ * @title applyMethodTheme
+ * @description Applies method-based accent classes across editor controls.
+ */
+const applyMethodTheme = (methodRaw?: string) => {
+  const methodSelect = document.querySelector("[data-editor-api-method]");
+  const selectedMethod =
+    methodRaw ??
+    (methodSelect instanceof HTMLSelectElement ? methodSelect.value : "POST");
+  const theme = getMethodTheme(selectedMethod);
+
+  document
+    .querySelectorAll<HTMLElement>("[data-method-theme]")
+    .forEach((node) => {
+      const role = node.getAttribute("data-method-theme") ?? "";
+
+      if (role === "method-select") {
+        node.classList.remove(...THEME_TEXT_CLASSES);
+        node.classList.add(theme.text);
+        return;
+      }
+
+      if (role === "save-button") {
+        node.classList.remove(...THEME_SOLID_BG_CLASSES, ...THEME_HOVER_BG_CLASSES);
+        node.classList.add(theme.solidBg, theme.solidHoverBg);
+        return;
+      }
+
+      if (role === "section-title") {
+        node.classList.remove(...THEME_TEXT_CLASSES);
+        node.classList.add(theme.text);
+        return;
+      }
+
+      if (role === "section-action") {
+        node.classList.remove(...THEME_TEXT_CLASSES, ...THEME_HOVER_TEXT_CLASSES);
+        node.classList.add(theme.text, theme.textHover);
+        return;
+      }
+
+      if (role === "row-action") {
+        node.classList.remove(...THEME_HOVER_TEXT_CLASSES);
+        node.classList.add(theme.textHover);
+        return;
+      }
+
+      if (role === "field-input") {
+        node.classList.remove(...THEME_FOCUS_TEXT_CLASSES);
+        node.classList.add(theme.focusText);
+        return;
+      }
+
+      if (role === "required-toggle") {
+        const isRequired = node.textContent?.trim() === "YES";
+        node.classList.remove(...THEME_SOFT_BG_CLASSES, ...THEME_TEXT_CLASSES);
+        if (isRequired) {
+          node.classList.add(theme.softBg, theme.text);
+        } else {
+          node.classList.add("bg-bg-elevated", "text-text-dim");
+        }
+      }
+    });
+};
+
+/**
+ * @title initMethodTheme
+ * @description Initializes and keeps method-driven accents synchronized.
+ */
+const initMethodTheme = () => {
+  const methodSelect = document.querySelector("[data-editor-api-method]");
+
+  if (methodSelect instanceof HTMLSelectElement) {
+    applyMethodTheme(methodSelect.value);
+    methodSelect.addEventListener("change", () => {
+      applyMethodTheme(methodSelect.value);
+    });
+  } else {
+    applyMethodTheme("POST");
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target) {
+      return;
+    }
+
+    if (
+      target.closest("[data-handler='add']") ||
+      target.closest("[data-handler='toggle']") ||
+      target.closest("[data-handler='move-up']") ||
+      target.closest("[data-handler='move-down']")
+    ) {
+      window.setTimeout(() => {
+        applyMethodTheme();
+      }, 0);
+    }
+  });
 };
 
 /**
@@ -1044,6 +1240,7 @@ const deleteApi = async (folderName: string, apiName: string) => {
 
 void init();
 initEnvPanel();
+initMethodTheme();
 
 document.addEventListener("click", (e) => {
   const target = e.target instanceof Element ? e.target : null;

@@ -53,12 +53,11 @@ export const toggleRequired = (trigger: Element) => {
     const nextIsYes = !isYes
     trigger.textContent = nextIsYes ? 'YES' : 'NO'
 
+    trigger.classList.remove('bg-accent-success/20', 'bg-accent-primary/20', 'bg-accent-warning/20', 'bg-accent-danger/20', 'text-accent-success', 'text-accent-primary', 'text-accent-warning', 'text-accent-danger')
+
     if (nextIsYes) {
         trigger.classList.remove('bg-bg-elevated', 'text-text-dim')
-        trigger.classList.add('bg-accent-primary/20', 'text-accent-primary')
     } else {
-        trigger.classList.remove('bg-accent-primary/20', 'text-accent-primary')
         trigger.classList.add('bg-bg-elevated', 'text-text-dim')
     }
 }
-

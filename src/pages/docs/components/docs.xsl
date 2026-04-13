@@ -169,18 +169,33 @@
     </xsl:template>
 
     <xsl:template match="/">
-        <div class="space-y-3">
-            <xsl:for-each select="/collection/api">
-                <xsl:apply-templates select="."/>
-            </xsl:for-each>
+        <div class="space-y-4">
+            <xsl:if test="count(/collection/api) &gt; 0">
+                <section class="space-y-3">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-dim">Root APIs</p>
+                    <xsl:for-each select="/collection/api">
+                        <xsl:apply-templates select="."/>
+                    </xsl:for-each>
+                </section>
+            </xsl:if>
 
             <xsl:for-each select="/collection/group">
-                <xsl:variable name="groupName" select="@name"/>
-                <xsl:for-each select="api">
-                    <xsl:apply-templates select=".">
-                        <xsl:with-param name="group" select="$groupName"/>
-                    </xsl:apply-templates>
-                </xsl:for-each>
+                <xsl:if test="position() &gt; 1 or count(/collection/api) &gt; 0">
+                    <div class="border-t border-border-subtle"></div>
+                </xsl:if>
+
+                <section class="space-y-3">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-text-dim">
+                        <xsl:text>Group: </xsl:text>
+                        <xsl:value-of select="@name"/>
+                    </p>
+                    <xsl:variable name="groupName" select="@name"/>
+                    <xsl:for-each select="api">
+                        <xsl:apply-templates select=".">
+                            <xsl:with-param name="group" select="$groupName"/>
+                        </xsl:apply-templates>
+                    </xsl:for-each>
+                </section>
             </xsl:for-each>
 
             <xsl:if test="count(/collection/api) = 0 and count(/collection/group/api) = 0">
