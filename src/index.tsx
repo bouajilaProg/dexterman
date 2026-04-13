@@ -18,6 +18,14 @@ app.use(
 );
 
 app.use(
+  "/vendor/*",
+  serveStatic({
+    root: "./node_modules/lucide/dist/umd",
+    rewriteRequestPath: (path) => path.replace(/^\/vendor\//, ""),
+  }),
+);
+
+app.use(
   "/editor/*",
   serveStatic({
     root: "./dist/pages/editor",

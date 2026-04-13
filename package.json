@@ -3,6 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"pnpm run dev:server\" \"pnpm run dev:css\"",
+    "dev:test-api": "node testAPI/server.mjs",
     "docker:dev": "pnpm run build:client && concurrently \"pnpm run dev:server\" \"pnpm run dev:css\" \"pnpm run dev:client\"",
     "dev:server": "tsx watch src/index.tsx",
     "dev:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/styles.css --watch",
@@ -13,6 +14,7 @@
     "build:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/styles.css --minify",
     "prestart": "pnpm run build",
     "start": "node dist/index.js",
+    "start:test-api": "node testAPI/server.mjs",
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down",
     "docker:dev:up": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build",
@@ -25,6 +27,7 @@
     "@hono/node-server": "^1.19.13",
     "hono": "^4.12.12",
     "linkedom": "^0.18.12",
+    "lucide": "^1.8.0",
     "xslt-processor": "^5.0.7"
   },
   "devDependencies": {
